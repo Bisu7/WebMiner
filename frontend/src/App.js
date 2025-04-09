@@ -1,264 +1,267 @@
-import React, { useState } from 'react';
-
-// Sample data - in a real app this would come from your backend
-const sampleData = {
-  pageInfo: {
-    title: "Sample Website",
-    url: "https://example.com",
-    lastScraped: "2025-03-11T12:00:00Z"
-  },
-  metrics: {
-    wordCount: 1250,
-    paragraphs: 15,
-    images: 8,
-    links: 24
-  },
-  frequentWords: [
-    { word: "example", count: 25 },
-    { word: "data", count: 18 },
-    { word: "information", count: 14 },
-    { word: "content", count: 12 },
-    { word: "website", count: 10 }
-  ],
-  linkAnalysis: [
-    { type: "Internal", count: 16 },
-    { type: "External", count: 8 }
-  ],
-  timeData: [
-    { date: "2025-03-05", visitors: 120 },
-    { date: "2025-03-06", visitors: 150 },
-    { date: "2025-03-07", visitors: 180 },
-    { date: "2025-03-08", visitors: 200 },
-    { date: "2025-03-09", visitors: 250 },
-    { date: "2025-03-10", visitors: 280 },
-    { date: "2025-03-11", visitors: 310 }
-  ]
-};
+import React, { useState, useEffect} from 'react';
+import {ProductList,ProductPriceChart,CategoryDistribution, PriceRangeDistribution} from './components/Product';
+import "./App.css"
+import Loader from './components/Loader';
 
 const ScrapingDashboard = () => {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   const [activeView, setActiveView] = useState('dashboard');
+  const [loading , setLoading] = useState(true);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    // Simulate loading (or replace with actual data fetch)
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 10000); 
+
+    return () => clearTimeout(timer); // Clean up
+  }, []);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setIsLoading(true);
     
-    // In a real app, this would be an API call to your backend
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setData(sampleData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      // Handle error state
-    } finally {
+    try{
+      const response = await fetch('http://127.0.0.1:5000/',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: url }),
+      });
+  
+      const responseData = await response.json();
+      console.log('Response:', responseData);
+      setData(responseData);
+      setIsLoading(false);
+    } catch(error) {
+      console.error('Error sending url:', error);
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex h-screen bg-gray-100" style={{ display: 'flex', height: '100vh', backgroundColor: '#f3f4f6' }}>
-      {/* Sidebar */}
-      <div className="w-64 bg-gray-800 text-white" style={{ width: '16rem', backgroundColor: '#1f2937', color: 'white' }}>
-        <div className="p-4 border-b border-gray-700" style={{ padding: '1rem', borderBottom: '1px solid #374151' }}>
-          <h1 className="text-2xl font-bold" style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>WebScraper</h1>
-          <p className="text-gray-400 text-sm" style={{ color: '#9ca3af', fontSize: '0.875rem' }}>Data Visualization Dashboard</p>
-        </div>
+    loading ? <Loader/>:
+      <div className="flex h-screen bg-gray-100" style={{ display: 'flex', height: '100vh', backgroundColor: '#f3f4f6' }}>
         
-        <nav className="mt-6" style={{ marginTop: '1.5rem' }}>
-          <SidebarItem 
-            label="Dashboard" 
-            active={activeView === 'dashboard'} 
-            onClick={() => setActiveView('dashboard')} 
-          />
-          <SidebarItem 
-            label="Content Analysis" 
-            active={activeView === 'content'} 
-            onClick={() => setActiveView('content')} 
-          />
-          <SidebarItem 
-            label="Link Analysis" 
-            active={activeView === 'links'} 
-            onClick={() => setActiveView('links')} 
-          />
-          <SidebarItem 
-            label="Word Frequency" 
-            active={activeView === 'words'} 
-            onClick={() => setActiveView('words')} 
-          />
-          <SidebarItem 
-            label="Settings" 
-            active={activeView === 'settings'} 
-            onClick={() => setActiveView('settings')} 
-          />
-        </nav>
-      </div>
+        {/* Sidebar */}
+        <div className="w-64 bg-gray-800 text-white" style={{ width: '16rem', backgroundColor: '#1f2937', color: 'white' }}>
+          <div className="p-4 border-b border-gray-700" style={{ padding: '1rem', borderBottom: '1px solid #374151' }}>
+            <h1 className="text-2xl font-bold" style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>WebScraper</h1>
+            <p className="text-gray-400 text-sm" style={{ color: '#9ca3af', fontSize: '0.875rem' }}>Data Visualization Dashboard</p>
+          </div>
+          
+          <nav className="mt-6" style={{ marginTop: '1.5rem' }}>
+            <SidebarItem 
+              label="Dashboard" 
+              active={activeView === 'dashboard'} 
+              onClick={() => setActiveView('dashboard')} 
+            />
+            <SidebarItem 
+              label="Products" 
+              active={activeView === 'products'} 
+              onClick={() => setActiveView('products')} 
+            />
+            <SidebarItem 
+              label="Content Analysis" 
+              active={activeView === 'content'} 
+              onClick={() => setActiveView('content')} 
+            />
+            <SidebarItem 
+              label="Link Analysis" 
+              active={activeView === 'links'} 
+              onClick={() => setActiveView('links')} 
+            />
+            <SidebarItem 
+              label="Word Frequency" 
+              active={activeView === 'words'} 
+              onClick={() => setActiveView('words')} 
+            />
+            <SidebarItem 
+              label="Settings" 
+              active={activeView === 'settings'} 
+              onClick={() => setActiveView('settings')} 
+            />
+          </nav>
+        </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto" style={{ flex: '1', overflowY: 'auto' }}>
-        <header className="bg-white shadow p-4" style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1rem' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center' }}>
-            <div className="flex-1 relative" style={{ flex: '1', position: 'relative' }}>
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" 
-                   style={{ position: 'absolute', top: 0, bottom: 0, left: 0, paddingLeft: '0.75rem', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
-                <span role="img" aria-label="globe">🌐</span>
+        {/* Main Content */}
+        <div className="flex-1 overflow-y-auto" style={{ flex: '1', overflowY: 'auto' }}>
+          <header className="bg-white shadow p-4" style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1rem' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center' }}>
+              <div className="flex-1 relative" style={{ flex: '1', position: 'relative' }}>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" 
+                    style={{ position: 'absolute', top: 0, bottom: 0, left: 0, paddingLeft: '0.75rem', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+                  <span role="img" aria-label="globe">🌐</span>
+                </div>
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="Enter website URL (e.g., https://example.com)"
+                  style={{ 
+                    width: '100%', 
+                    paddingLeft: '2.5rem', 
+                    paddingRight: '1rem', 
+                    paddingTop: '0.5rem', 
+                    paddingBottom: '0.5rem', 
+                    border: '1px solid #d1d5db', 
+                    borderRadius: '0.375rem',
+                    outline: 'none'
+                  }}
+                  required
+                />
               </div>
-              <input
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="Enter website URL (e.g., https://example.com)"
+              <button
+                type="submit"
+                disabled={isLoading}
                 style={{ 
-                  width: '100%', 
-                  paddingLeft: '2.5rem', 
-                  paddingRight: '1rem', 
-                  paddingTop: '0.5rem', 
-                  paddingBottom: '0.5rem', 
-                  border: '1px solid #d1d5db', 
-                  borderRadius: '0.375rem',
-                  outline: 'none'
+                  marginLeft: '1rem', 
+                  padding: '0.5rem 1rem', 
+                  backgroundColor: isLoading ? '#93c5fd' : '#2563eb', 
+                  color: 'white', 
+                  borderRadius: '0.375rem', 
+                  border: 'none',
+                  cursor: isLoading ? 'not-allowed' : 'pointer'
                 }}
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{ 
-                marginLeft: '1rem', 
-                padding: '0.5rem 1rem', 
-                backgroundColor: isLoading ? '#93c5fd' : '#2563eb', 
-                color: 'white', 
-                borderRadius: '0.375rem', 
-                border: 'none',
-                cursor: isLoading ? 'not-allowed' : 'pointer'
-              }}
-            >
-              {isLoading ? "Scraping..." : "Scrape Data"}
-            </button>
-          </form>
-        </header>
+              >
+                {isLoading ? "Scraping..." : "Scrape Data"}
+              </button>
+            </form>
+          </header>
 
-        <main style={{ padding: '1.5rem' }}>
-          {!data && !isLoading && (
-            <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-              <span role="img" aria-label="globe" style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>🌐</span>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#374151' }}>No Data Available</h2>
-              <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>Enter a URL above and click "Scrape Data" to begin</p>
-            </div>
-          )}
-
-          {isLoading && (
-            <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#374151' }}>Scraping Data...</h2>
-              <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>This may take a few moments</p>
-            </div>
-          )}
-
-          {data && !isLoading && (
-            <div>
-              <div style={{ marginBottom: '1.5rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937' }}>{data.pageInfo.title}</h2>
-                <p style={{ color: '#6b7280' }}>{data.pageInfo.url}</p>
-                <p style={{ fontSize: '0.875rem', color: '#9ca3af' }}>Last scraped: {new Date(data.pageInfo.lastScraped).toLocaleString()}</p>
+          <main style={{ padding: '1.5rem' }}>
+            {!data && !isLoading && (
+              <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+                <span role="img" aria-label="globe" style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>🌐</span>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#374151' }}>No Data Available</h2>
+                <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>Enter a URL above and click "Scrape Data" to begin</p>
               </div>
+            )}
 
-              {/* Dashboard View */}
-              {activeView === 'dashboard' && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                  <MetricsCard data={data.metrics} />
-                  <WordFrequencySimple data={data.frequentWords} />
-                  <LinkAnalysisSimple data={data.linkAnalysis} />
-                  <VisitorsSimple data={data.timeData} />
+            {isLoading && (
+              <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#374151' }}>Scraping Data...</h2>
+                <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>This may take a few moments</p>
+              </div>
+            )}
+
+            {data && !isLoading && (
+              <div>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937' }}>{data.pageInfo.title}</h2>
+                  <p style={{ color: '#6b7280' }}>{data.pageInfo.url}</p>
+                  <p style={{ fontSize: '0.875rem', color: '#9ca3af' }}>Last scraped: {new Date(data.pageInfo.lastScraped).toLocaleString()}</p>
                 </div>
-              )}
 
-              {/* Content Analysis View */}
-              {activeView === 'content' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-                  <MetricsCard data={data.metrics} />
-                  <WordFrequencySimple data={data.frequentWords} />
-                </div>
-              )}
-
-              {/* Link Analysis View */}
-              {activeView === 'links' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-                  <LinkAnalysisSimple data={data.linkAnalysis} />
-                </div>
-              )}
-
-              {/* Word Frequency View */}
-              {activeView === 'words' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-                  <WordFrequencyDetailTable data={data.frequentWords} />
-                </div>
-              )}
-
-              {/* Settings View */}
-              {activeView === 'settings' && (
-                <div style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', borderRadius: '0.5rem', padding: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>Dashboard Settings</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>Scraping Depth</label>
-                      <select style={{ 
-                        display: 'block', 
-                        width: '100%', 
-                        padding: '0.5rem 0.75rem', 
-                        border: '1px solid #d1d5db', 
-                        borderRadius: '0.375rem', 
-                        backgroundColor: 'white'
-                      }}>
-                        <option>Homepage Only</option>
-                        <option>One Level Deep</option>
-                        <option>Two Levels Deep</option>
-                      </select>
+                {/* Dashboard View */}
+                {activeView === 'dashboard' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                    <MetricsCard data={data.metrics} />
+                    <WordFrequencySimple data={data.frequentWords} />
+                    <LinkAnalysisSimple data={data.linkAnalysis} />
+                    <VisitorsSimple data={data.timeData} />
+                  </div>
+                )}
+                {/* Products View */}
+                {activeView === 'products' && data && !isLoading && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                      <ProductPriceChart priceHistory={data.priceHistory} />
+                      <CategoryDistribution products={data.products} />
+                      <PriceRangeDistribution products={data.products} />
                     </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>Data Refresh Rate</label>
-                      <select style={{ 
-                        display: 'block', 
-                        width: '100%', 
-                        padding: '0.5rem 0.75rem', 
-                        border: '1px solid #d1d5db', 
-                        borderRadius: '0.375rem', 
-                        backgroundColor: 'white'
-                      }}>
-                        <option>Manual Only</option>
-                        <option>Daily</option>
-                        <option>Weekly</option>
-                      </select>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <input
-                        id="respect-robots"
-                        name="respect-robots"
-                        type="checkbox"
-                        style={{ 
-                          height: '1rem', 
-                          width: '1rem', 
-                          color: '#2563eb', 
+                    <ProductList products={data.products} />
+                  </div>
+                )}
+
+                {/* Content Analysis View */}
+                {activeView === 'content' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+                    <MetricsCard data={data.metrics} />
+                    <WordFrequencySimple data={data.frequentWords} />
+                  </div>
+                )}
+
+                {/* Link Analysis View */}
+                {activeView === 'links' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+                    <LinkAnalysisSimple data={data.linkAnalysis} />
+                  </div>
+                )}
+
+                {/* Word Frequency View */}
+                {activeView === 'words' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+                    <WordFrequencyDetailTable data={data.frequentWords} />
+                  </div>
+                )}
+
+                {/* Settings View */}
+                {activeView === 'settings' && (
+                  <div style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', borderRadius: '0.5rem', padding: '1.5rem' }}>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>Dashboard Settings</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>Scraping Depth</label>
+                        <select style={{ 
+                          display: 'block', 
+                          width: '100%', 
+                          padding: '0.5rem 0.75rem', 
                           border: '1px solid #d1d5db', 
-                          borderRadius: '0.25rem' 
-                        }}
-                        defaultChecked
-                      />
-                      <label htmlFor="respect-robots" style={{ marginLeft: '0.5rem', fontSize: '0.875rem', color: '#374151' }}>
-                        Respect robots.txt rules
-                      </label>
+                          borderRadius: '0.375rem', 
+                          backgroundColor: 'white'
+                        }}>
+                          <option>Homepage Only</option>
+                          <option>One Level Deep</option>
+                          <option>Two Levels Deep</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>Data Refresh Rate</label>
+                        <select style={{ 
+                          display: 'block', 
+                          width: '100%', 
+                          padding: '0.5rem 0.75rem', 
+                          border: '1px solid #d1d5db', 
+                          borderRadius: '0.375rem', 
+                          backgroundColor: 'white'
+                        }}>
+                          <option>Manual Only</option>
+                          <option>Daily</option>
+                          <option>Weekly</option>
+                        </select>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input
+                          id="respect-robots"
+                          name="respect-robots"
+                          type="checkbox"
+                          style={{ 
+                            height: '1rem', 
+                            width: '1rem', 
+                            color: '#2563eb', 
+                            border: '1px solid #d1d5db', 
+                            borderRadius: '0.25rem' 
+                          }}
+                          defaultChecked
+                        />
+                        <label htmlFor="respect-robots" style={{ marginLeft: '0.5rem', fontSize: '0.875rem', color: '#374151' }}>
+                          Respect robots.txt rules
+                        </label>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
-        </main>
+                )}
+              </div>
+            )}
+          </main>
+        </div>
       </div>
-    </div>
+    
   );
 };
 
