@@ -11,6 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+main {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Adjust section containers */
+.hero, .features, .how-it-works, .testimonials, .footer {
+  width: 100%;
+  max-width: 100%;
+}
 
 @tailwind base;
 @tailwind components;
