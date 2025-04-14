@@ -61,7 +61,9 @@ const Header = () => {
         <a href="#contact">Contact</a>
       </div>
       <div className="cta-buttons">
-        <button className="login-btn">Log In</button>
+        <button className="login-btn">Log In
+        <GoogleLogin />
+        </button>
         <button className="signup-btn">Sign Up Free</button>
       </div>
     </nav>
@@ -105,6 +107,31 @@ const Hero = () => {
       </div>
     </section>
   );
+};
+
+const GoogleLogin = () => {
+  useEffect(() => {
+    /* global google */
+    window.google.accounts.id.initialize({
+      client_id: "739213241777-80tecrlbicqn4vgi5rl95ko69vq1c31n.apps.googleusercontent.com",
+      callback: handleCredentialResponse,
+    });
+
+    window.google.accounts.id.renderButton(
+      document.getElementById("google-login"),
+      {
+        theme: "outline",
+        size: "large",
+      }
+    );
+  }, []);
+
+  const handleCredentialResponse = (response) => {
+    console.log("Encoded JWT ID token: " + response.credential);
+    // You can decode the token using jwt-decode or send it to the backend for verification
+  };
+
+  return <div id="google-login"></div>;
 };
 
 // Features Component
