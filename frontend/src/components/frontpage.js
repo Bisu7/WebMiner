@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-const WebMinerLanding = () => {
+const WebMinerLanding = ({onStart}) => {
   const [isModelRotating, setIsModelRotating] = useState(true);
   
   // Animation for the floating 3D model
@@ -26,7 +26,7 @@ const WebMinerLanding = () => {
       
       {/* Main Content */}
       <div className="content">
-        <Header />
+        <Header onStart = {onStart} />
         <Hero />
         <Features />
         <HowItWorks />
@@ -40,7 +40,36 @@ const WebMinerLanding = () => {
 };
 
 // Header Component
-const Header = () => {
+const Header = ( {onStart} ) => {
+  const handleClick = () => {
+    const clientId = "739213241777-80tecrlbicqn4vgi5rl95ko69vq1c31n.apps.googleusercontent.com";
+    const redirectUri = "http://localhost:3000"; // or your actual redirect URI
+    const scope = "email profile openid";
+    const responseType = "token id_token";
+
+    const nonce = crypto.randomUUID(); // generates a secure unique nonce
+
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&include_granted_scopes=true&prompt=select_account&nonce=${nonce}`;
+
+
+    const width = 500;
+    const height = 600;
+    const left = window.innerWidth / 2 - width / 2;
+    const top = window.innerHeight / 2 - height / 2;
+
+    const loginWindow = window.open(
+      authUrl,
+      "GoogleLoginPopup",
+      `width=${width},height=${height},top=${top},left=${left}`
+    );
+    const pollTimer = setInterval(() => {
+      if (loginWindow.closed) {
+        clearInterval(pollTimer);
+        // Optionally, you can check if tokens are in localStorage or just proceed
+        onStart(); // 🚀 Redirect to dashboard
+      }
+    }, 500);
+  };
   return (
     <nav className="header">
       <div className="logo">
@@ -61,8 +90,8 @@ const Header = () => {
         <a href="#contact">Contact</a>
       </div>
       <div className="cta-buttons">
-        <button className="login-btn">Log In
-        <GoogleLogin />
+        <button className="login-btn" onClick={handleClick}>Log in
+        {/* <GoogleLogin /> */}
         </button>
         <button className="signup-btn">Sign Up Free</button>
       </div>
@@ -109,30 +138,31 @@ const Hero = () => {
   );
 };
 
-const GoogleLogin = () => {
-  useEffect(() => {
-    /* global google */
-    window.google.accounts.id.initialize({
-      client_id: "739213241777-80tecrlbicqn4vgi5rl95ko69vq1c31n.apps.googleusercontent.com",
-      callback: handleCredentialResponse,
-    });
+// const GoogleLogin = () => {
+//   useEffect(() => {
+//     /* global google */
+//     window.google.accounts.id.initialize({
+//       client_id: "739213241777-80tecrlbicqn4vgi5rl95ko69vq1c31n.apps.googleusercontent.com",
+//       callback: handleCredentialResponse,
+//     });
+//   }, []);
 
-    window.google.accounts.id.renderButton(
-      document.getElementById("google-login"),
-      {
-        theme: "outline",
-        size: "large",
-      }
-    );
-  }, []);
+//   const handleCredentialResponse = (response) => {
+//     console.log("Encoded JWT ID token: " + response.credential);
+//     // Optional: decode or send to backend
+//   };
 
-  const handleCredentialResponse = (response) => {
-    console.log("Encoded JWT ID token: " + response.credential);
-    // You can decode the token using jwt-decode or send it to the backend for verification
-  };
+//   const handleClick = () => {
+//     window.google.accounts.id.prompt(); // Show the Google login prompt
+//   };
 
-  return <div id="google-login"></div>;
-};
+//   // return (
+//   //   <button onClick={handleClick} className="login-btn">
+//   //     <img src="/google-icon.svg" alt="Google" style={{ height: 20, marginRight: 8 }} />
+//   //     Sign in with Google
+//   //   </button>
+//   // );
+// };
 
 // Features Component
 const Features = () => {
