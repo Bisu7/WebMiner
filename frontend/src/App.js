@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Loader from './components/Loader';
 import WebMinerLanding from './components/frontpage';
 import ScrapingDashboard from './components/dashboard';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 const App = () => {
-  const [loading, setLoading] = useState(true);         // For Loader
-  const [view, setView] = useState('landing');          // landing | dashboard
+  const [loading, setLoading] = useState(true); // For Loader
 
   useEffect(() => {
     // Simulate loader
@@ -17,9 +17,14 @@ const App = () => {
 
   if (loading) return <Loader />;
 
-  if (view === 'landing') return <WebMinerLanding onStart={() => setView('dashboard')} />;
-
-  return <ScrapingDashboard />;
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<WebMinerLanding />} />
+        <Route path="/dashboard" element={<ScrapingDashboard />} />
+      </Routes>
+    </Router>
+  );
 };
 
 export default App;

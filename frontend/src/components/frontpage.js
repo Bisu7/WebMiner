@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const WebMinerLanding = ({onStart}) => {
   const [isModelRotating, setIsModelRotating] = useState(true);
@@ -26,7 +27,7 @@ const WebMinerLanding = ({onStart}) => {
       
       {/* Main Content */}
       <div className="content">
-        <Header onStart = {onStart} />
+        <Header />
         <Hero />
         <Features />
         <HowItWorks />
@@ -40,10 +41,11 @@ const WebMinerLanding = ({onStart}) => {
 };
 
 // Header Component
-const Header = ( {onStart} ) => {
+const Header = () => {
+  const navigate = useNavigate();
   const handleClick = () => {
-    const clientId = "739213241777-80tecrlbicqn4vgi5rl95ko69vq1c31n.apps.googleusercontent.com";
-    const redirectUri = "http://localhost:3000"; // or your actual redirect URI
+    const clientId = "486633608588-7c1lb83j8q6jti9beb9ra8dqipv4v6t9.apps.googleusercontent.com";
+    const redirectUri = "http://localhost:3000/oauth-callback.html"; // or your actual redirect URI
     const scope = "email profile openid";
     const responseType = "token id_token";
 
@@ -62,13 +64,20 @@ const Header = ( {onStart} ) => {
       "GoogleLoginPopup",
       `width=${width},height=${height},top=${top},left=${left}`
     );
-    const pollTimer = setInterval(() => {
-      if (loginWindow.closed) {
-        clearInterval(pollTimer);
-        // Optionally, you can check if tokens are in localStorage or just proceed
-        onStart(); // 🚀 Redirect to dashboard
+    const messageListener = (event) => {
+      if (event.origin !== window.location.origin) return;
+  
+      const { type, accessToken, idToken } = event.data;
+      if (type === 'google-auth') {
+        // ✅ Received tokens
+        window.removeEventListener("message", messageListener);
+        loginWindow.close();
+        // Save tokens, call backend, etc.
+        navigate('/dashboard'); // Navigate to dashboard
       }
-    }, 500);
+    };
+  
+    window.addEventListener("message", messageListener);
   };
   return (
     <nav className="header">

@@ -1,19 +1,22 @@
 import React, { useState, useEffect} from 'react';
-import {ProductList,ProductPriceChart,CategoryDistribution, PriceRangeDistribution} from './Product';
+import {ProductList, ProductPriceChart, CategoryDistribution, PriceRangeDistribution} from './Product';
 
 const ScrapingDashboard = () => {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   const [activeView, setActiveView] = useState('dashboard');
+  const [profileOpen, setProfileOpen] = useState(false);
 
-//   useEffect(() => {
-//     // Simulate loading (or replace with actual data fetch)
-//     const timer = setTimeout(() => {
-//     }, 1000); 
-
-//     return () => clearTimeout(timer); // Clean up
-//   }, []);
+  // Mock user data - in a real application, this would come from authentication
+  const user = {
+    name: "Alex Johnson",
+    email: "alex@example.com",
+    role: "Data Analyst",
+    avatar: "AJ",
+    joined: "Feb 2025",
+    projects: 12
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -39,239 +42,340 @@ const ScrapingDashboard = () => {
   };
 
   return (      
-      <div className="flex h-screen bg-gray-100" style={{ display: 'flex', height: '100vh', backgroundColor: '#f3f4f6' }}>
-
-
-        {/* Sidebar */}
-        <div className="w-64 bg-gray-800 text-white" style={{ width: '16rem', backgroundColor: '#1f2937', color: 'white' }}>
-          <div className="p-4 border-b border-gray-700" style={{ padding: '1rem', borderBottom: '1px solid #374151' }}>
-            <h1 className="text-2xl font-bold" style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>WebScraper</h1>
-            <p className="text-gray-400 text-sm" style={{ color: '#9ca3af', fontSize: '0.875rem' }}>Data Visualization Dashboard</p>
-          </div>
-          
-          <nav className="mt-6" style={{ marginTop: '1.5rem' }}>
-            <SidebarItem 
-              label="Dashboard" 
-              active={activeView === 'dashboard'} 
-              onClick={() => setActiveView('dashboard')} 
-            />
-            <SidebarItem 
-              label="Products" 
-              active={activeView === 'products'} 
-              onClick={() => setActiveView('products')} 
-            />
-            <SidebarItem 
-              label="Content Analysis" 
-              active={activeView === 'content'} 
-              onClick={() => setActiveView('content')} 
-            />
-            <SidebarItem 
-              label="Link Analysis" 
-              active={activeView === 'links'} 
-              onClick={() => setActiveView('links')} 
-            />
-            <SidebarItem 
-              label="Word Frequency" 
-              active={activeView === 'words'} 
-              onClick={() => setActiveView('words')} 
-            />
-            <SidebarItem 
-              label="Settings" 
-              active={activeView === 'settings'} 
-              onClick={() => setActiveView('settings')} 
-            />
-          </nav>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 overflow-y-auto" style={{ flex: '1', overflowY: 'auto' }}>
-          <header className="bg-white shadow p-4" style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1rem' }}>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center' }}>
-              <div className="flex-1 relative" style={{ flex: '1', position: 'relative' }}>
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" 
-                    style={{ position: 'absolute', top: 0, bottom: 0, left: 0, paddingLeft: '0.75rem', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
-                  <span role="img" aria-label="globe">🌐</span>
-                </div>
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Enter website URL (e.g., https://example.com)"
-                  style={{ 
-                    width: '100%', 
-                    paddingLeft: '2.5rem', 
-                    paddingRight: '1rem', 
-                    paddingTop: '0.5rem', 
-                    paddingBottom: '0.5rem', 
-                    border: '1px solid #d1d5db', 
-                    borderRadius: '0.375rem',
-                    outline: 'none'
-                  }}
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                style={{ 
-                  marginLeft: '1rem', 
-                  padding: '0.5rem 1rem', 
-                  backgroundColor: isLoading ? '#93c5fd' : '#2563eb', 
-                  color: 'white', 
-                  borderRadius: '0.375rem', 
-                  border: 'none',
-                  cursor: isLoading ? 'not-allowed' : 'pointer'
-                }}
-              >
-                {isLoading ? "Scraping..." : "Scrape Data"}
-              </button>
-            </form>
-          </header>
-
-          <main style={{ padding: '1.5rem' }}>
-            {!data && !isLoading && (
-              <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                <span role="img" aria-label="globe" style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>🌐</span>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#374151' }}>No Data Available</h2>
-                <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>Enter a URL above and click "Scrape Data" to begin</p>
-              </div>
-            )}
-
-            {isLoading && (
-              <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#374151' }}>Scraping Data...</h2>
-                <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>This may take a few moments</p>
-              </div>
-            )}
-
-            {data && !isLoading && (
-              <div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937' }}>{data.pageInfo.title}</h2>
-                  <p style={{ color: '#6b7280' }}>{data.pageInfo.url}</p>
-                  <p style={{ fontSize: '0.875rem', color: '#9ca3af' }}>Last scraped: {new Date(data.pageInfo.lastScraped).toLocaleString()}</p>
-                </div>
-
-                {/* Dashboard View */}
-                {activeView === 'dashboard' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                    <MetricsCard data={data.metrics} />
-                    <WordFrequencySimple data={data.frequentWords} />
-                    <LinkAnalysisSimple data={data.linkAnalysis} />
-                    <VisitorsSimple data={data.timeData} />
-                  </div>
-                )}
-                {/* Products View */}
-                {activeView === 'products' && data && !isLoading && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                      <ProductPriceChart priceHistory={data.priceHistory} />
-                      <CategoryDistribution products={data.products} />
-                      <PriceRangeDistribution products={data.products} />
-                    </div>
-                    <ProductList products={data.products} />
-                  </div>
-                )}
-
-                {/* Content Analysis View */}
-                {activeView === 'content' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-                    <MetricsCard data={data.metrics} />
-                    <WordFrequencySimple data={data.frequentWords} />
-                  </div>
-                )}
-
-                {/* Link Analysis View */}
-                {activeView === 'links' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-                    <LinkAnalysisSimple data={data.linkAnalysis} />
-                  </div>
-                )}
-
-                {/* Word Frequency View */}
-                {activeView === 'words' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-                    <WordFrequencyDetailTable data={data.frequentWords} />
-                  </div>
-                )}
-
-                {/* Settings View */}
-                {activeView === 'settings' && (
-                  <div style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', borderRadius: '0.5rem', padding: '1.5rem' }}>
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>Dashboard Settings</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>Scraping Depth</label>
-                        <select style={{ 
-                          display: 'block', 
-                          width: '100%', 
-                          padding: '0.5rem 0.75rem', 
-                          border: '1px solid #d1d5db', 
-                          borderRadius: '0.375rem', 
-                          backgroundColor: 'white'
-                        }}>
-                          <option>Homepage Only</option>
-                          <option>One Level Deep</option>
-                          <option>Two Levels Deep</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>Data Refresh Rate</label>
-                        <select style={{ 
-                          display: 'block', 
-                          width: '100%', 
-                          padding: '0.5rem 0.75rem', 
-                          border: '1px solid #d1d5db', 
-                          borderRadius: '0.375rem', 
-                          backgroundColor: 'white'
-                        }}>
-                          <option>Manual Only</option>
-                          <option>Daily</option>
-                          <option>Weekly</option>
-                        </select>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <input
-                          id="respect-robots"
-                          name="respect-robots"
-                          type="checkbox"
-                          style={{ 
-                            height: '1rem', 
-                            width: '1rem', 
-                            color: '#2563eb', 
-                            border: '1px solid #d1d5db', 
-                            borderRadius: '0.25rem' 
-                          }}
-                          defaultChecked
-                        />
-                        <label htmlFor="respect-robots" style={{ marginLeft: '0.5rem', fontSize: '0.875rem', color: '#374151' }}>
-                          Respect robots.txt rules
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </main>
+    <div className="flex h-screen bg-gray-900 text-blue-50 relative overflow-hidden">
+      {/* Background Grid */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#0f172a,_#0b1120)]"></div>
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'linear-gradient(rgba(65, 105, 225, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(65, 105, 225, 0.07) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+          animation: 'gridAnimation 25s linear infinite'
+        }}></div>
+        
+        {/* Particles */}
+        <div className="absolute inset-0 z-1">
+          {Array(20).fill().map((_, i) => (
+            <div key={i} className="absolute w-1 h-1 bg-blue-400 rounded-full opacity-70 shadow-glow-blue" style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              boxShadow: '0 0 10px 2px rgba(56, 189, 248, 0.3)',
+              animation: `particleFloat ${15 + Math.random() * 10}s infinite linear ${Math.random() * 5}s`
+            }}></div>
+          ))}
         </div>
       </div>
-    
+
+      {/* Sidebar */}
+      <div className="w-64 relative z-10 border-r border-blue-900/30 backdrop-blur-sm bg-black/20 flex flex-col">
+        <div className="p-6 border-b border-blue-900/30">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">WebMiner</h1>
+          <p className="text-blue-200/70 text-sm">Data Visualization Dashboard</p>
+        </div>
+        
+        <nav className="mt-6 flex-1">
+          <SidebarItem 
+            label="Dashboard" 
+            active={activeView === 'dashboard'} 
+            onClick={() => setActiveView('dashboard')} 
+          />
+          <SidebarItem 
+            label="Products" 
+            active={activeView === 'products'} 
+            onClick={() => setActiveView('products')} 
+          />
+          <SidebarItem 
+            label="Content Analysis" 
+            active={activeView === 'content'} 
+            onClick={() => setActiveView('content')} 
+          />
+          <SidebarItem 
+            label="Link Analysis" 
+            active={activeView === 'links'} 
+            onClick={() => setActiveView('links')} 
+          />
+          <SidebarItem 
+            label="Word Frequency" 
+            active={activeView === 'words'} 
+            onClick={() => setActiveView('words')} 
+          />
+          <SidebarItem 
+            label="Settings" 
+            active={activeView === 'settings'} 
+            onClick={() => setActiveView('settings')} 
+          />
+        </nav>
+
+        {/* Profile Section at Bottom */}
+        <div className="mt-auto border-t border-blue-900/30">
+          <div 
+            className="p-4 flex items-center cursor-pointer hover:bg-blue-900/20"
+            onClick={() => setProfileOpen(!profileOpen)}
+          >
+            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-medium shadow-glow-blue">
+              {user.avatar}
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-blue-100">{user.name}</p>
+              <p className="text-xs text-blue-300">{user.role}</p>
+            </div>
+            <div className="ml-auto">
+              <svg className={`w-5 h-5 text-blue-300 transition-transform ${profileOpen ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
+
+          {/* Profile Dropdown */}
+          {profileOpen && (
+            <div className="backdrop-blur-sm bg-black/40 border-t border-blue-900/30 p-4 animate-fadeIn">
+              <div className="mb-4">
+                <p className="text-xs text-blue-300 mb-1">Email</p>
+                <p className="text-sm text-blue-100">{user.email}</p>
+              </div>
+              <div className="flex justify-between mb-4">
+                <div>
+                  <p className="text-xs text-blue-300 mb-1">Joined</p>
+                  <p className="text-sm text-blue-100">{user.joined}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-blue-300 mb-1">Projects</p>
+                  <p className="text-sm text-blue-100">{user.projects}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button className="w-full py-2 px-3 bg-blue-800/30 hover:bg-blue-700/40 rounded text-sm text-blue-100 border border-blue-700/30 transition-colors">
+                  Profile
+                </button>
+                <button className="w-full py-2 px-3 bg-red-800/30 hover:bg-red-700/40 rounded text-sm text-red-100 border border-red-700/30 transition-colors">
+                  Log Out
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto relative z-10">
+        <header className="backdrop-blur-sm bg-black/30 border-b border-blue-900/30 p-4">
+          <form onSubmit={handleSubmit} className="flex items-center">
+            <div className="flex-1 relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span role="img" aria-label="globe" className="text-blue-300">🌐</span>
+              </div>
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Enter website URL (e.g., https://example.com)"
+                className="w-full py-2 pl-10 pr-4 rounded bg-blue-900/20 border border-blue-800/50 text-blue-100 placeholder-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`ml-4 px-4 py-2 rounded bg-gradient-to-r from-blue-400 to-indigo-400 text-white font-medium shadow-glow-blue ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-lg hover:from-blue-500 hover:to-indigo-500'}`}
+            >
+              {isLoading ? "Scraping..." : "Scrape Data"}
+            </button>
+          </form>
+        </header>
+
+        <main className="p-6">
+          {!data && !isLoading && (
+            <div className="text-center py-16">
+              <span role="img" aria-label="globe" className="text-6xl block mb-4 text-blue-400">🌐</span>
+              <h2 className="text-2xl font-semibold text-blue-100 mb-2">No Data Available</h2>
+              <p className="text-blue-300">Enter a URL above and click "Scrape Data" to begin</p>
+            </div>
+          )}
+
+          {isLoading && (
+            <div className="text-center py-16">
+              <div className="mb-4">
+                <div className="w-16 h-16 mx-auto relative perspective-600">
+                  <div className="w-full h-full transform-style-preserve-3d animate-spin-slow">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="absolute w-full h-full bg-gradient-to-br from-blue-400 to-indigo-400 opacity-85 border border-blue-200/20 shadow-glow-blue"></div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <h2 className="text-2xl font-semibold text-blue-100 mb-2">Scraping Data...</h2>
+              <p className="text-blue-300">This may take a few moments</p>
+            </div>
+          )}
+
+          {data && !isLoading && (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">{data.pageInfo.title}</h2>
+                <p className="text-blue-300">{data.pageInfo.url}</p>
+                <p className="text-sm text-blue-400/70">Last scraped: {new Date(data.pageInfo.lastScraped).toLocaleString()}</p>
+              </div>
+
+              {/* Dashboard View */}
+              {activeView === 'dashboard' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <MetricsCard data={data.metrics} />
+                  <WordFrequencySimple data={data.frequentWords} />
+                  <LinkAnalysisSimple data={data.linkAnalysis} />
+                  <VisitorsSimple data={data.timeData} />
+                </div>
+              )}
+              
+              {/* Products View */}
+              {activeView === 'products' && (
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <ProductPriceChart priceHistory={data.priceHistory} />
+                    <CategoryDistribution products={data.products} />
+                    <PriceRangeDistribution products={data.products} />
+                  </div>
+                  <ProductList products={data.products} />
+                </div>
+              )}
+
+              {/* Content Analysis View */}
+              {activeView === 'content' && (
+                <div className="grid grid-cols-1 gap-6">
+                  <MetricsCard data={data.metrics} />
+                  <WordFrequencySimple data={data.frequentWords} />
+                </div>
+              )}
+
+              {/* Link Analysis View */}
+              {activeView === 'links' && (
+                <div className="grid grid-cols-1 gap-6">
+                  <LinkAnalysisSimple data={data.linkAnalysis} />
+                </div>
+              )}
+
+              {/* Word Frequency View */}
+              {activeView === 'words' && (
+                <div className="grid grid-cols-1 gap-6">
+                  <WordFrequencyDetailTable data={data.frequentWords} />
+                </div>
+              )}
+
+              {/* Settings View */}
+              {activeView === 'settings' && (
+                <div className="backdrop-blur-sm bg-black/30 border border-blue-900/30 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold mb-4 text-blue-100">Dashboard Settings</h3>
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-blue-200 mb-2">Scraping Depth</label>
+                      <select className="w-full p-2 bg-blue-900/20 border border-blue-800/50 rounded text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400/30">
+                        <option>Homepage Only</option>
+                        <option>One Level Deep</option>
+                        <option>Two Levels Deep</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-blue-200 mb-2">Data Refresh Rate</label>
+                      <select className="w-full p-2 bg-blue-900/20 border border-blue-800/50 rounded text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400/30">
+                        <option>Manual Only</option>
+                        <option>Daily</option>
+                        <option>Weekly</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        id="respect-robots"
+                        name="respect-robots"
+                        type="checkbox"
+                        className="h-4 w-4 text-blue-400 border border-blue-800 rounded focus:ring-blue-400/30 bg-blue-900/20"
+                        defaultChecked
+                      />
+                      <label htmlFor="respect-robots" className="ml-2 text-sm text-blue-200">
+                        Respect robots.txt rules
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes gridAnimation {
+          0% {
+            background-position: 0 0;
+          }
+          100% {
+            background-position: 0 40px;
+          }
+        }
+        
+        @keyframes particleFloat {
+          0% {
+            transform: translateY(0) translateX(0);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-100px) translateX(100px);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .animate-spin-slow {
+          animation: spin 4s linear infinite;
+        }
+        
+        @keyframes spin {
+          from {
+            transform: rotateX(0deg) rotateY(0deg);
+          }
+          to {
+            transform: rotateX(360deg) rotateY(360deg);
+          }
+        }
+        
+        .perspective-600 {
+          perspective: 600px;
+        }
+        
+        .transform-style-preserve-3d {
+          transform-style: preserve-3d;
+        }
+        
+        .shadow-glow-blue {
+          box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+      `}</style>
+    </div>
   );
 };
 
 // Component for sidebar items
 const SidebarItem = ({ label, active, onClick }) => (
   <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0.75rem 1.5rem',
-      cursor: 'pointer',
-      backgroundColor: active ? '#374151' : 'transparent',
-      color: active ? 'white' : '#9ca3af'
-    }}
+    className={`flex items-center py-3 px-6 cursor-pointer ${active ? 'bg-blue-800/30 border-l-2 border-blue-400' : 'text-blue-300 hover:bg-blue-900/20'}`}
     onClick={onClick}
   >
     <span>{label}</span>
@@ -279,53 +383,47 @@ const SidebarItem = ({ label, active, onClick }) => (
 );
 
 // Components for different card types
-
 const MetricsCard = ({ data }) => (
-  <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1.5rem' }}>
-    <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>Page Metrics</h3>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-      <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#eff6ff', borderRadius: '0.375rem' }}>
-        <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Words</p>
-        <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2563eb' }}>{data.wordCount}</p>
+  <div className="backdrop-blur-sm bg-black/30 border border-blue-900/30 rounded-lg p-6">
+    <h3 className="text-lg font-semibold mb-4 text-blue-100">Page Metrics</h3>
+    <div className="grid grid-cols-2 gap-4">
+      <div className="text-center p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg">
+        <p className="text-blue-300 text-sm">Words</p>
+        <p className="text-2xl font-bold text-blue-400">{data.wordCount}</p>
       </div>
-      <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#ecfdf5', borderRadius: '0.375rem' }}>
-        <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Paragraphs</p>
-        <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#059669' }}>{data.paragraphs}</p>
+      <div className="text-center p-4 bg-emerald-900/20 border border-emerald-800/50 rounded-lg">
+        <p className="text-emerald-300 text-sm">Paragraphs</p>
+        <p className="text-2xl font-bold text-emerald-400">{data.paragraphs}</p>
       </div>
-      <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f5f3ff', borderRadius: '0.375rem' }}>
-        <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Images</p>
-        <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#7c3aed' }}>{data.images}</p>
+      <div className="text-center p-4 bg-purple-900/20 border border-purple-800/50 rounded-lg">
+        <p className="text-purple-300 text-sm">Images</p>
+        <p className="text-2xl font-bold text-purple-400">{data.images}</p>
       </div>
-      <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#fefce8', borderRadius: '0.375rem' }}>
-        <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Links</p>
-        <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#ca8a04' }}>{data.links}</p>
+      <div className="text-center p-4 bg-amber-900/20 border border-amber-800/50 rounded-lg">
+        <p className="text-amber-300 text-sm">Links</p>
+        <p className="text-2xl font-bold text-amber-400">{data.links}</p>
       </div>
     </div>
   </div>
 );
 
 const WordFrequencySimple = ({ data }) => {
-  // Find max count for scaling
   const maxCount = Math.max(...data.map(item => item.count));
   
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1.5rem' }}>
-      <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>Most Frequent Words</h3>
+    <div className="backdrop-blur-sm bg-black/30 border border-blue-900/30 rounded-lg p-6">
+      <h3 className="text-lg font-semibold mb-4 text-blue-100">Most Frequent Words</h3>
       <div>
-        {data.map((item, index) => (
-          <div key={item.word} style={{ marginBottom: '0.75rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-              <span style={{ fontSize: '0.875rem' }}>{item.word}</span>
-              <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>{item.count}</span>
+        {data.map((item) => (
+          <div key={item.word} className="mb-3">
+            <div className="flex justify-between mb-1">
+              <span className="text-sm text-blue-100">{item.word}</span>
+              <span className="text-sm text-blue-300">{item.count}</span>
             </div>
-            <div style={{ width: '100%', backgroundColor: '#e5e7eb', borderRadius: '0.25rem', height: '0.5rem' }}>
+            <div className="w-full bg-blue-900/30 rounded h-2">
               <div 
-                style={{ 
-                  width: `${(item.count / maxCount) * 100}%`, 
-                  backgroundColor: '#4f46e5', 
-                  height: '100%', 
-                  borderRadius: '0.25rem' 
-                }} 
+                className="bg-gradient-to-r from-blue-400 to-indigo-400 h-full rounded"
+                style={{ width: `${(item.count / maxCount) * 100}%` }} 
               />
             </div>
           </div>
@@ -339,26 +437,21 @@ const LinkAnalysisSimple = ({ data }) => {
   const total = data.reduce((sum, item) => sum + item.count, 0);
   
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1.5rem' }}>
-      <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>Link Analysis</h3>
-      <div style={{ display: 'flex', height: '200px', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        {/* Create a simple pie chart with CSS */}
-        <div style={{ 
-          width: '150px', 
-          height: '150px', 
-          borderRadius: '50%', 
-          background: `conic-gradient(#3b82f6 0% ${(data[0].count / total) * 100}%, #f97316 ${(data[0].count / total) * 100}% 100%)` 
+    <div className="backdrop-blur-sm bg-black/30 border border-blue-900/30 rounded-lg p-6">
+      <h3 className="text-lg font-semibold mb-4 text-blue-100">Link Analysis</h3>
+      <div className="flex h-52 items-center justify-center relative">
+        <div className="w-40 h-40 rounded-full overflow-hidden" style={{ 
+          background: `conic-gradient(#38bdf8 0% ${(data[0].count / total) * 100}%, #f97316 ${(data[0].count / total) * 100}% 100%)`,
+          boxShadow: '0 0 30px rgba(56, 189, 248, 0.3)'
         }} />
-        <div style={{ position: 'absolute', top: '100px', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: '2rem' }}>
+        <div className="absolute top-36 left-0 right-0 flex justify-center gap-8">
           {data.map(item => (
-            <div key={item.type} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ 
-                width: '0.75rem', 
-                height: '0.75rem', 
-                backgroundColor: item.type === 'Internal' ? '#3b82f6' : '#f97316',
-                borderRadius: '0.25rem'
+            <div key={item.type} className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded" style={{ 
+                backgroundColor: item.type === 'Internal' ? '#38bdf8' : '#f97316',
+                boxShadow: `0 0 10px ${item.type === 'Internal' ? 'rgba(56, 189, 248, 0.7)' : 'rgba(249, 115, 22, 0.7)'}`
               }} />
-              <span>{item.type}: {item.count} ({Math.round((item.count / total) * 100)}%)</span>
+              <span className="text-blue-100">{item.type}: {item.count} ({Math.round((item.count / total) * 100)}%)</span>
             </div>
           ))}
         </div>
@@ -371,24 +464,19 @@ const VisitorsSimple = ({ data }) => {
   const maxVisitors = Math.max(...data.map(item => item.visitors));
   
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1.5rem' }}>
-      <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>Visitor Trends</h3>
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'flex-end', 
-        justifyContent: 'space-between', 
-        height: '200px', 
-        padding: '1rem 0' 
-      }}>
+    <div className="backdrop-blur-sm bg-black/30 border border-blue-900/30 rounded-lg p-6">
+      <h3 className="text-lg font-semibold mb-4 text-blue-100">Visitor Trends</h3>
+      <div className="flex items-end justify-between h-48 p-4">
         {data.map((item, index) => (
-          <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-            <div style={{ 
-              height: `${(item.visitors / maxVisitors) * 150}px`, 
-              width: '20px', 
-              backgroundColor: '#3b82f6', 
-              borderRadius: '0.25rem 0.25rem 0 0'
-            }} />
-            <div style={{ fontSize: '0.75rem', marginTop: '0.5rem', transform: 'rotate(-45deg)', transformOrigin: 'top left' }}>
+          <div key={index} className="flex flex-col items-center flex-1">
+            <div 
+              className="w-5 bg-gradient-to-t from-blue-400 to-indigo-400 rounded-t"
+              style={{ 
+                height: `${(item.visitors / maxVisitors) * 120}px`,
+                boxShadow: '0 0 15px rgba(56, 189, 248, 0.4)'
+              }}
+            />
+            <div className="text-xs mt-2 transform -rotate-45 origin-top-left text-blue-300">
               {item.date.slice(5)}
             </div>
           </div>
@@ -402,27 +490,27 @@ const WordFrequencyDetailTable = ({ data }) => {
   const totalCount = data.reduce((sum, item) => sum + item.count, 0);
   
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
-      <div style={{ padding: '1.5rem', borderBottom: '1px solid #e5e7eb' }}>
-        <h3 style={{ fontSize: '1.125rem', fontWeight: '600' }}>Word Frequency Analysis</h3>
+    <div className="backdrop-blur-sm bg-black/30 border border-blue-900/30 rounded-lg overflow-hidden">
+      <div className="p-6 border-b border-blue-900/30">
+        <h3 className="text-lg font-semibold text-blue-100">Word Frequency Analysis</h3>
       </div>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ minWidth: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ backgroundColor: '#f9fafb' }}>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border-collapse">
+          <thead className="bg-blue-900/20">
             <tr>
-              <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Rank</th>
-              <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Word</th>
-              <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Count</th>
-              <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Percentage</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-blue-300 uppercase">Rank</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-blue-300 uppercase">Word</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-blue-300 uppercase">Count</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-blue-300 uppercase">Percentage</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-blue-900/30">
             {data.map((item, index) => (
-              <tr key={item.word} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '0.75rem 1.5rem', fontSize: '0.875rem', color: '#6b7280' }}>{index + 1}</td>
-                <td style={{ padding: '0.75rem 1.5rem', fontSize: '0.875rem', fontWeight: '500', color: '#111827' }}>{item.word}</td>
-                <td style={{ padding: '0.75rem 1.5rem', fontSize: '0.875rem', color: '#6b7280' }}>{item.count}</td>
-                <td style={{ padding: '0.75rem 1.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
+              <tr key={item.word} className="hover:bg-blue-900/10">
+                <td className="py-3 px-6 text-sm text-blue-300">{index + 1}</td>
+                <td className="py-3 px-6 text-sm font-medium text-blue-100">{item.word}</td>
+                <td className="py-3 px-6 text-sm text-blue-300">{item.count}</td>
+                <td className="py-3 px-6 text-sm text-blue-300">
                   {((item.count / totalCount) * 100).toFixed(1)}%
                 </td>
               </tr>
