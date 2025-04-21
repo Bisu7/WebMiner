@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
-const WebMinerLanding = ({onStart}) => {
+const WebMinerLanding = ({ setUser }) => {
   const [isModelRotating, setIsModelRotating] = useState(true);
   
   // Animation for the floating 3D model
@@ -41,7 +41,7 @@ const WebMinerLanding = ({onStart}) => {
 };
 
 // Header Component
-const Header = () => {
+const Header = ({setUser}) => {
   const navigate = useNavigate();
   const handleClick = () => {
     const clientId = "486633608588-7c1lb83j8q6jti9beb9ra8dqipv4v6t9.apps.googleusercontent.com";
@@ -67,11 +67,17 @@ const Header = () => {
     const messageListener = (event) => {
       if (event.origin !== window.location.origin) return;
   
-      const { type, accessToken, idToken } = event.data;
+      const { type, user } = event.data;
       if (type === 'google-auth') {
         // ✅ Received tokens
         window.removeEventListener("message", messageListener);
         loginWindow.close();
+        localStorage.setItem('user',JSON.stringify(user));
+        if (typeof setUser === "function") {
+          setUser(user); // ✅ Call only if it's a function
+        } else {
+          console.error("setUser is not a function");
+        }
         // Save tokens, call backend, etc.
         navigate('/dashboard'); // Navigate to dashboard
       }

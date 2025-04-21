@@ -1,29 +1,88 @@
-import React, { useState, useEffect} from 'react';
-import {ProductList, ProductPriceChart, CategoryDistribution, PriceRangeDistribution} from './Product';
+import React, { useState, useEffect } from 'react';
+import { ProductList, ProductPriceChart, CategoryDistribution, PriceRangeDistribution } from './Product';
+import ProfilePage from './profile'; // Make sure to import the new component
 
-const ScrapingDashboard = () => {
+const ScrapingDashboard = ({user,setUser}) => {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   const [activeView, setActiveView] = useState('dashboard');
   const [profileOpen, setProfileOpen] = useState(false);
+  const [showProfilePage, setShowProfilePage] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // For demo purposes, assume user is authenticated
 
-  // Mock user data - in a real application, this would come from authentication
-  const user = {
-    name: "Alex Johnson",
-    email: "alex@example.com",
-    role: "Data Analyst",
-    avatar: "AJ",
-    joined: "Feb 2025",
-    projects: 12
+
+  // In a real implementation, we would have an effect to check if the user is authenticated
+  useEffect(() => {
+    // Check if user is authenticated via Google OAuth
+    // This is where you would typically call your auth provider's methods
+    const checkAuthStatus = async () => {
+      try {
+        // Simulating an auth check
+        // const user = await googleAuth.getCurrentUser();
+        // if (user) {
+        //   setIsAuthenticated(true);
+        //   setUser({
+        //     name: user.displayName,
+        //     email: user.email,
+        //     photoURL: user.photoURL,
+        //     role: "Data Analyst", // This could come from your backend
+        //     joined: new Date(user.metadata.creationTime).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        //     projects: 0 // This could come from your backend
+        //   });
+        // } else {
+        //   setIsAuthenticated(false);
+        // }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      // In a real implementation, you would call your auth provider's login method
+      // const result = await googleAuth.signInWithPopup();
+      // if (result.user) {
+      //   setIsAuthenticated(true);
+      //   setUser({
+      //     name: result.user.displayName,
+      //     email: result.user.email,
+      //     photoURL: result.user.photoURL,
+      //     role: "Data Analyst",
+      //     joined: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+      //     projects: 0
+      //   });
+      // }
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // In a real implementation, you would call your auth provider's logout method
+      // await googleAuth.signOut();
+      setIsAuthenticated(false);
+      setShowProfilePage(false);
+      localStorage.removeItem("user");
+      setUser(null);
+      // Redirect to front page or login screen
+      window.location.href = "/"; // Or use your router's navigation
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     
-    try{
-      const response = await fetch('http://127.0.0.1:5000/',{
+    try {
+      const response = await fetch('http://127.0.0.1:5000/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,13 +94,60 @@ const ScrapingDashboard = () => {
       console.log('Response:', responseData);
       setData(responseData);
       setIsLoading(false);
-    } catch(error) {
+    } catch (error) {
       console.error('Error sending url:', error);
       setIsLoading(false);
     }
   };
 
-  return (      
+  // If user is not authenticated, show login screen
+  if (!isAuthenticated) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-900 text-blue-50">
+        <div className="w-full max-w-md p-8 space-y-8 bg-black/40 backdrop-blur-sm border border-blue-900/30 rounded-xl">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">WebMiner</h1>
+            <p className="mt-2 text-blue-200/70">Sign in to access your data visualization dashboard</p>
+          </div>
+          
+          <button
+            onClick={handleLogin}
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white text-gray-800 rounded-lg font-medium shadow hover:shadow-lg transition-shadow"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path
+                // fill="currentColor"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+              />
+              <path
+                // fill="currentColor"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                // fill="currentColor"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05"
+              />
+              <path
+                // fill="currentColor"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
+            </svg>
+            Sign in with Google
+          </button>
+          
+          <div className="text-center text-blue-300 text-sm">
+            By signing in, you agree to our Terms of Service and Privacy Policy
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
     <div className="flex h-screen bg-gray-900 text-blue-50 relative overflow-hidden">
       {/* Background Grid */}
       <div className="absolute inset-0 z-0">
@@ -111,9 +217,17 @@ const ScrapingDashboard = () => {
             className="p-4 flex items-center cursor-pointer hover:bg-blue-900/20"
             onClick={() => setProfileOpen(!profileOpen)}
           >
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-medium shadow-glow-blue">
-              {user.avatar}
-            </div>
+            {user.photoURL ? (
+              <img 
+                src={user.photoURL} 
+                alt="Profile" 
+                className="w-10 h-10 rounded-full border border-blue-500/30 shadow-glow-blue"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-medium shadow-glow-blue">
+                {user.avatar}
+              </div>
+            )}
             <div className="ml-3">
               <p className="text-sm font-medium text-blue-100">{user.name}</p>
               <p className="text-xs text-blue-300">{user.role}</p>
@@ -143,10 +257,19 @@ const ScrapingDashboard = () => {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <button className="w-full py-2 px-3 bg-blue-800/30 hover:bg-blue-700/40 rounded text-sm text-blue-100 border border-blue-700/30 transition-colors">
+                <button 
+                  className="w-full py-2 px-3 bg-blue-800/30 hover:bg-blue-700/40 rounded text-sm text-blue-100 border border-blue-700/30 transition-colors"
+                  onClick={() => {
+                    setShowProfilePage(true);
+                    setProfileOpen(false);
+                  }}
+                >
                   Profile
                 </button>
-                <button className="w-full py-2 px-3 bg-red-800/30 hover:bg-red-700/40 rounded text-sm text-red-100 border border-red-700/30 transition-colors">
+                <button 
+                  className="w-full py-2 px-3 bg-red-800/30 hover:bg-red-700/40 rounded text-sm text-red-100 border border-red-700/30 transition-colors"
+                  onClick={handleLogout}
+                >
                   Log Out
                 </button>
               </div>
@@ -291,7 +414,7 @@ const ScrapingDashboard = () => {
                       <label htmlFor="respect-robots" className="ml-2 text-sm text-blue-200">
                         Respect robots.txt rules
                       </label>
-                    </div>
+                      </div>
                   </div>
                 </div>
               )}
@@ -299,6 +422,15 @@ const ScrapingDashboard = () => {
           )}
         </main>
       </div>
+
+      {/* Profile Page Modal */}
+      {showProfilePage && (
+        <ProfilePage 
+          user={user}
+          onClose={() => setShowProfilePage(false)}
+          onLogout={handleLogout}
+        />
+      )}
 
       {/* CSS Animations */}
       <style jsx>{`
@@ -366,6 +498,10 @@ const ScrapingDashboard = () => {
         
         .shadow-glow-blue {
           box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+        
+        .shadow-glow-red {
+          box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
         }
       `}</style>
     </div>

@@ -1,29 +1,46 @@
+<!-- public/oauth-callback.html -->
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>OAuth Callback</title>
-  </head>
   <body>
     <script>
-      // Parse URL hash to extract access token and ID token
+      function parseJwt(token) {
+        const base64Url = token.split('.')[1];
+        const base64 = decodeURIComponent(
+          atob(base64Url)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+        return JSON.parse(base64);
+      }
+
       const hash = window.location.hash.substring(1);
       const params = new URLSearchParams(hash);
+      const idToken = params.get("id_token");
+      const accessToken = params.get("access_token");
 
-      const accessToken = params.get('access_token');
-      const idToken = params.get('id_token');
-
-      // Send tokens to opener window
-      if (window.opener) {
+      if (idToken) {
+        const user = parseJwt(idToken); // get user info from token
         window.opener.postMessage(
           {
-            type: 'google-auth',
-            accessToken,
+            type: "google-auth",
             idToken,
+            accessToken,
+            user: {
+              name: user.name,
+              email: user.email,
+              photoURL: user.picture,
+              avatar: user.given_name?.charAt(0),
+              joined: new Date().toLocaleDateString(),
+              role: "Developer", // default role
+              projects: 0,
+            },
           },
           window.location.origin
         );
-        window.close(); // Close the popup
       }
+
+      window.close();
     </script>
   </body>
 </html>

@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 const App = () => {
   const [loading, setLoading] = useState(true); // For Loader
+  const [user,setUser] = useState(null);
 
   useEffect(() => {
     // Simulate loader
@@ -15,13 +16,18 @@ const App = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const savedUser = JSON.parse(localStorage.getItem('user'));
+    if(savedUser) setUser(savedUser);
+  },[]);
+
   if (loading) return <Loader />;
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<WebMinerLanding />} />
-        <Route path="/dashboard" element={<ScrapingDashboard />} />
+        <Route path="/" element={<WebMinerLanding setUser={setUser} />} />
+        <Route path="/dashboard" element={<ScrapingDashboard user={user} setUser={setUser} />} />
       </Routes>
     </Router>
   );
