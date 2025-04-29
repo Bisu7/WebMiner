@@ -1,0 +1,7 @@
+training_data/www_muscleblaze_com_20250426164445.html|https://www.muscleblaze.com/categories/proteins?navKey=CL-1703&itracker=w:home|products|;|www.muscleblaze.com
+training_data/www_myntra_com_20250426164506.html|https://www.myntra.com/nike-shoes?extra_search_param=isautosuggestentry%3atrue%3a%3aid%3a2297-nike-shoes&rawQuery=Nike%20Shoes|www.myntra.com
+training_data/www_myntra_com_20250426164822.html|https://www.myntra.com/nike-shoes?extra_search_param=isautosuggestentry%3atrue%3a%3aid%3a2297-nike-shoes&rawQuery=Nike%20Shoes|www.myntra.com
+training_data/www_myntra_com_20250426164840.html|https://www.myntra.com/sports-shoes/nike/nike-men-revolution-6-road-running-shoes/16273972/buy|www.myntra.com
+training_data/www_myntra_com_20250426164913.html|https://www.myntra.com/mens-apparel?f=Brand%3ALevis%2CU.S.%20Polo%20Assn.%2CU.S.%20Polo%20Assn.%20Denim%20Co.%2CU.S.%20Polo%20Assn.%20Tailored%3A%3ACategories%3ACo-Ords%2CJackets%2CJeans%2CShirts%2CShorts%2CSweaters%2CSweatshirts%2CTrack%20Pants%2CTrousers%2CTshirts&rawQuery=mens%20apparel&rf=Discount%20Range%3A10.0_100.0_10.0%20TO%20100.0|www.myntra.com
+training_data/www_myntra_com_20250426164955.html|https://www.myntra.com/nike-shoes-men?extra_search_param=isautosuggestentry%3atrue%3a%3aid%3a2297-nike-shoes-men&rawQuery=Nike%20Shoes%20Men|www.myntra.com
+training_data/www_amazon_in_20250426165043.html|https://www.amazon.in/s?k=iphone&crid=1JJ0WIT3BL03O&sprefix=%2Caps%2C388&ref=nb_sb_ss_recent_1_0_recent|www.amazon.in

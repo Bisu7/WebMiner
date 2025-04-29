@@ -105,10 +105,7 @@ const Header = ({setUser}) => {
         <a href="#contact">Contact</a>
       </div>
       <div className="cta-buttons">
-        <button className="login-btn" onClick={handleClick}>Log in
-        {/* <GoogleLogin /> */}
-        </button>
-        <button className="signup-btn">Sign Up Free</button>
+        <button className="signup-btn" onClick={handleClick}>Sign In With Google</button>
       </div>
     </nav>
   );
@@ -122,7 +119,7 @@ const Hero = () => {
         <h1>Extract & Visualize Web Data With AI</h1>
         <p>Transform any website into structured, actionable insights with our advanced scraping and visualization tools.</p>
         <div className="hero-cta">
-          <button className="primary-btn">Try It Now</button>
+          <button className="primary-btn" >Try It Now</button>
           <button className="secondary-btn">Watch Demo</button>
         </div>
       </div>

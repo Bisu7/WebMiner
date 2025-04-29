@@ -1,26 +1,288 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+
 
 // Product List Component
-export const ProductList = ({ products }) => {
-    return (
-      <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
-        <div style={{ padding: '1.5rem', borderBottom: '1px solid #e5e7eb' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: '600' }}>Products Found</h3>
+export const ProductList = ({ products: initialProducts }) => {
+  const [products, setProducts] = useState(initialProducts);
+  const [filters, setFilters] = useState({
+    category: "",
+    inStock: "",
+    minPrice: "",
+    maxPrice: ""
+  });
+  const [sortBy, setSortBy] = useState("name");
+  const [sortDirection, setSortDirection] = useState("asc");
+  
+  // Blue color palette
+  const blueColors = {
+    light: '#e0f2fe',    // Light blue background
+    medium: '#3b82f6',   // Medium blue for borders and active elements
+    dark: '#1e40af',     // Dark blue for text and focus states
+    hover: '#60a5fa'     // Hover state
+  };
+  
+  // Get unique categories for the filter dropdown
+  const categories = [...new Set(initialProducts.map(product => product.category))];
+  
+  // Apply filters and sorting whenever they change
+  useEffect(() => {
+    let filteredProducts = [...initialProducts];
+    
+    // Apply category filter
+    if (filters.category) {
+      filteredProducts = filteredProducts.filter(product => 
+        product.category === filters.category
+      );
+    }
+    
+    // Apply stock filter
+    if (filters.inStock !== "") {
+      const stockValue = filters.inStock === "true";
+      filteredProducts = filteredProducts.filter(product => 
+        product.inStock === stockValue
+      );
+    }
+    
+    // Apply price range filters
+    if (filters.minPrice) {
+      filteredProducts = filteredProducts.filter(product => 
+        product.price >= parseFloat(filters.minPrice)
+      );
+    }
+    
+    if (filters.maxPrice) {
+      filteredProducts = filteredProducts.filter(product => 
+        product.price <= parseFloat(filters.maxPrice)
+      );
+    }
+    
+    // Apply sorting
+    filteredProducts.sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "price":
+          comparison = a.price - b.price;
+          break;
+        case "rating":
+          comparison = a.rating - b.rating;
+          break;
+        default:
+          comparison = 0;
+      }
+      
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+    
+    setProducts(filteredProducts);
+  }, [initialProducts, filters, sortBy, sortDirection]);
+  
+  // Handler for filter changes
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  // Handler for sort changes
+  const handleSortChange = (e) => {
+    setSortBy(e.target.value);
+  };
+  
+  // Handler for sort direction changes
+  const handleSortDirectionChange = () => {
+    setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+  };
+  
+  // Common style for form controls (now with blue theme)
+  const formControlStyle = {
+    width: '100%', 
+    padding: '0.5rem', 
+    border: `1px solid ${blueColors.medium}`,
+    borderRadius: '0.375rem',
+    fontSize: '0.875rem',
+    outline: 'none',
+    transition: 'border-color 0.2s, box-shadow 0.2s'
+  };
+  
+  // Label style with blue theme
+  const labelStyle = {
+    display: 'block', 
+    fontSize: '0.875rem', 
+    fontWeight: '500', 
+    marginBottom: '0.25rem', 
+    color: blueColors.dark
+  };
+  
+  return (
+    <div style={{ color:'black', backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
+      <div style={{ padding: '1.5rem', borderBottom: '1px solid #e5e7eb', backgroundColor: blueColors.light }}>
+        <h3 style={{  fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: blueColors.dark }}>Products Found</h3>
+        
+        {/* Filter and Sort Options */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+          {/* Category Filter */}
+          <div style={{ minWidth: '150px' }}>
+            <label style={labelStyle}>
+              Category
+            </label>
+            <select 
+              name="category" 
+              value={filters.category} 
+              onChange={handleFilterChange}
+              style={formControlStyle}
+            >
+              <option value="">All Categories</option>
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </div>
+          
+          {/* Stock Filter */}
+          <div style={{ minWidth: '150px' }}>
+            <label style={labelStyle}>
+              Availability
+            </label>
+            <select 
+              name="inStock" 
+              value={filters.inStock} 
+              onChange={handleFilterChange}
+              style={formControlStyle}
+            >
+              <option value="">All Items</option>
+              <option value="true">In Stock</option>
+              <option value="false">Out of Stock</option>
+            </select>
+          </div>
+          
+          {/* Price Range Filters */}
+          <div style={{ display: 'flex', gap: '0.5rem', minWidth: '200px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>
+                Min Price
+              </label>
+              <input 
+                type="number" 
+                name="minPrice" 
+                value={filters.minPrice} 
+                onChange={handleFilterChange}
+                placeholder="$0"
+                style={formControlStyle}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>
+                Max Price
+              </label>
+              <input 
+                type="number" 
+                name="maxPrice" 
+                value={filters.maxPrice} 
+                onChange={handleFilterChange}
+                placeholder="$1000+"
+                style={formControlStyle}
+              />
+            </div>
+          </div>
+          
+          {/* Sort Options */}
+          <div style={{ minWidth: '200px', marginLeft: 'auto' }}>
+            <label style={labelStyle}>
+              Sort By
+            </label>
+            <div style={{ display: 'flex' }}>
+              <select 
+                value={sortBy} 
+                onChange={handleSortChange}
+                style={{ 
+                  ...formControlStyle,
+                  borderRadius: '0.375rem 0 0 0.375rem',
+                  borderRight: 'none'
+                }}
+              >
+                <option value="name">Product Name</option>
+                <option value="price">Price</option>
+                <option value="rating">Rating</option>
+              </select>
+              <button 
+                onClick={handleSortDirectionChange}
+                style={{ 
+                  padding: '0.5rem', 
+                  border: `1px solid ${blueColors.medium}`,
+                  borderRadius: '0 0.375rem 0.375rem 0',
+                  backgroundColor: blueColors.medium,
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '38px',
+                  transition: 'background-color 0.2s'
+                }}
+              >
+                {sortDirection === "asc" ? "↑" : "↓"}
+              </button>
+            </div>
+          </div>
         </div>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ minWidth: '100%', borderCollapse: 'collapse' }}>
-            <thead style={{ backgroundColor: '#f9fafb' }}>
-              <tr>
-                <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>ID</th>
-                <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Product</th>
-                <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Price</th>
-                <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Category</th>
-                <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Rating</th>
-                <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
+        
+        {/* Apply Filters Button */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Results count */}
+          <div style={{ fontSize: '0.875rem', color: blueColors.dark }}>
+            Showing {products.length} of {initialProducts.length} products
+          </div>
+          
+          {/* Clear Filters Button */}
+          <button
+            onClick={() => {
+              setFilters({
+                category: "",
+                inStock: "",
+                minPrice: "",
+                maxPrice: ""
+              });
+              setSortBy("name");
+              setSortDirection("asc");
+            }}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: 'white',
+              border: `1px solid ${blueColors.medium}`,
+              borderRadius: '0.375rem',
+              color: blueColors.medium,
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s, color 0.2s'
+            }}
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
+      
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ minWidth: '100%', borderCollapse: 'collapse' }}>
+          <thead style={{ backgroundColor: '#f9fafb' }}>
+            <tr>
+              <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>ID</th>
+              <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Product</th>
+              <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Price</th>
+              <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Category</th>
+              <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Rating</th>
+              <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.length > 0 ? (
+              products.map((product) => (
                 <tr key={product.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                   <td style={{ padding: '0.75rem 1.5rem', fontSize: '0.875rem', color: '#6b7280' }}>{product.id}</td>
                   <td style={{ padding: '0.75rem 1.5rem', fontSize: '0.875rem', fontWeight: '500', color: '#111827' }}>{product.name}</td>
@@ -49,13 +311,20 @@ export const ProductList = ({ products }) => {
                     </span>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+                  No products found matching your filters. Try adjusting your criteria.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
-    );
-  };
+    </div>
+  );
+};
   
   // Product Price Chart Component
 export const ProductPriceChart = ({ priceHistory }) => {
@@ -87,7 +356,7 @@ export const ProductPriceChart = ({ priceHistory }) => {
     ).join(' ');
     
     return (
-      <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1.5rem' }}>
+      <div style={{color:'black', backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1.5rem' }}>
         <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>
           Price History: {productData.productName}
         </h3>
@@ -181,7 +450,7 @@ export  const CategoryDistribution = ({ products }) => {
     };
     
     return (
-      <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1.5rem' }}>
+      <div style={{ color:'black', backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1.5rem' }}>
         <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>Product Categories</h3>
         <div style={{ display: 'flex', height: '200px' }}>
           {/* Pie chart */}
@@ -253,7 +522,7 @@ export  const PriceRangeDistribution = ({ products }) => {
     const maxCount = Math.max(...rangeCounts.map(r => r.count));
     
     return (
-      <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1.5rem' }}>
+      <div style={{ color:'black',backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', padding: '1.5rem' }}>
         <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>Price Distribution</h3>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
