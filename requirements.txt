@@ -17,7 +17,7 @@ requests==2.31.0
 lxml==5.2.1
 
 # Optional: suppress warnings
-warnings-filter==0.1.2
+
 
 # For production environment or deployment
 Werkzeug==3.0.1
