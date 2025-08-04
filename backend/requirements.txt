@@ -1,15 +1,14 @@
+setuptools>=65.5.0
+wheel
+Cython==0.29.36
+
 # Python backend dependencies
 Flask==2.3.2
 Flask-Cors==4.0.0
 gunicorn==21.2.0
 
-# Build dependencies to avoid scikit-learn compilation error
-Cython==0.29.36
-setuptools==65.5.0
-wheel
-numpy==1.23.5  # Downgrade for compatibility with scikit-learn 1.3.2
-
 # ML and data processing
+numpy==1.23.5
 scikit-learn==1.3.2
 pandas==2.1.4
 joblib==1.3.2
