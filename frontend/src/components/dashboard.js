@@ -82,7 +82,7 @@ const ScrapingDashboard = ({user,setUser}) => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('https://webminer-zgqr.onrender.com', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

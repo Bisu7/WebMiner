@@ -45,13 +45,13 @@ const Header = ({setUser}) => {
   const navigate = useNavigate();
   const handleClick = () => {
     const clientId = "486633608588-7c1lb83j8q6jti9beb9ra8dqipv4v6t9.apps.googleusercontent.com";
-    const redirectUri = "http://localhost:3000/oauth-callback.html"; // or your actual redirect URI
+    const redirectUri = `${process.env.REACT_REDIRECT_API_URL}`; // or your actual redirect URI
     const scope = "email profile openid";
     const responseType = "token id_token";
 
     const nonce = crypto.randomUUID(); // generates a secure unique nonce
 
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&include_granted_scopes=true&prompt=select_account&nonce=${nonce}`;
+    const authUrl = process.env.GOOGLE_OAUTH_URL;
 
 
     const width = 500;
