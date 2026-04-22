@@ -157,4 +157,4 @@ The `Diagrams/` folder contains comprehensive UML and design documentation for t
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
-*Built with ❤️ by the WebMiner Team*
+
