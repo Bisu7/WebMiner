@@ -40,7 +40,7 @@ def receive_url():
     
     try:
         # Download the page
-        html_content = download_page
+        html_content = download_page(url)
         if not html_content:
             return jsonify({'status': 'error', 'message': 'Failed to download page'}), 500
             
